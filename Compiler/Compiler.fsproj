@@ -7,11 +7,13 @@
 
   <ItemGroup>
     <Reference Include="Sabre">
-      <HintPath>../bin/Release/net5.0/Sabre.dll</HintPath>
+      <HintPath>../ILCode/bin/Release/net5.0/Sabre.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Lexer.fs" />
+    <Compile Include="REPL.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
