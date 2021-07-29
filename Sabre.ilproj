@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.IL">
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <MicrosoftNetCoreIlasmPackageVersion>5.0.0</MicrosoftNetCoreIlasmPackageVersion>
+        <TargetExtension Condition="'$(TargetExtension)'==''">.x</TargetExtension>
+        <IncludePath Condition="'$(TargetFramework)' == 'net5.0'">include\net5.0</IncludePath>
+        <IlasmFlags>$(IlasmFlags) -INCLUDE=$(IncludePath)</IlasmFlags>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="File.il">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>
