@@ -1,11 +1,18 @@
 #+TITLE: Sabre Language
 
 * What is this?
-Sabre is an experimental language for .NET following the LISP style.
+Sabre is an experimental language for .NET following the SCHEME/LISP style.
 
 * What does the name mean?
 It is a pun with the names for the .NET languages, C# and F#, they are
 all sharp, so Sabre must be as well.
 
 * How should I run?
-For now, simply run *dotnet build -c Release* on *ILCode/* then run *Program.fs* on *Compiler/*
+Go to Compiler and do a dotnet run
++For now, simply run *dotnet build -c Release* on *ILCode/* then run *Program.fs* on *Compiler/*+
+
+* Journal
+  | Version   | Description                                 |
+  |-----------+---------------------------------------------|
+  | Alpha 0.1 | Adds boilerplate IL Support and mocked REPL |
+  | Alpha 0.2 | Adds a parser                               |
