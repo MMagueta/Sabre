@@ -2,7 +2,8 @@ module Parser
 
 open FParsec
 open System
-//#r "nuget: FParsec";; open FParsec;;
+
+//For the REPL: #r "nuget: FParsec";; open FParsec;;
 
 type Env = (string * LispVal ref) list ref
 
@@ -29,6 +30,7 @@ let parseExpr, parseExprRef : LispParser<LispVal> * LispParser<LispVal> ref = cr
 let chr c = skipChar c
 let endBy p sep = many (p .>> sep)
 let symbol : LispParser<char> = anyOf "!$%&|*+-/:<=>?@^_~#"
+let numberSign : LispParser<char> = anyOf "+-"
 
 //let parseList : LispParser<LispVal> = sepBy parseExpr spaces |>> List
 
@@ -37,7 +39,7 @@ let parseQuoted : LispParser<LispVal> =
     |>> fun expr -> List [ Atom "quote"; expr ]
 
 let parseNumber : LispParser<LispVal> =
-    many1Chars digit .>> spaces
+    many1Chars (digit .>> spaces)
     |>> (System.Int32.Parse >> Number)
 
 let parseString : LispParser<LispVal> =
@@ -54,7 +56,7 @@ let parseList =
 
 let parseAtom : LispParser<LispVal> =
     parse {
-        let! first = (letter <|> symbol) .>> spaces
+        let! first = (letter <|> symbol)
         let! rest = manyChars (letter <|> symbol <|> digit) .>> spaces
 
         return
@@ -64,7 +66,8 @@ let parseAtom : LispParser<LispVal> =
             | atom -> Atom atom
     }
 
-let parse () =
+let runParserRef =
+    //If possible, find a way to change the ref, this destroys potential parallelism
     do
         (parseExprRef
          := choice [ parseAtom
@@ -73,4 +76,8 @@ let parse () =
                      parseQuoted
                      parseList ])
 
-let show () = parseExprRef
+let parseExpression (input: string) = run (spaces >>. many parseExpr) input
+
+let parse (input: string array) =
+    runParserRef
+    parseExpression (System.String.Join(" ", input))
