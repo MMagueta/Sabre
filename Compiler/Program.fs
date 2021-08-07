@@ -1,7 +1,8 @@
 open System
-open Sabre
+open FParsec
+open Parser
 
 [<EntryPoint>]
 let main argv =
-    printfn "%A" (Messages.Print())
+    show ()
     0
