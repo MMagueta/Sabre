@@ -1,8 +1,13 @@
 open System
-open FParsec
+
+open Lexer
 open Parser
 
 [<EntryPoint>]
 let main argv =
-    show ()
+    "(format \"Hello from Sabre :)\")"
+    |> tokenize
+    |> parse
+    |> printfn "%A"
+
     0
