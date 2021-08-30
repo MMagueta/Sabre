@@ -16,6 +16,7 @@ and LispVal =
     | Atom of string
     | Func of FunctionMetadata
     | List of LispVal list
+    | Params of LispVal list
     | Number of int64
     | String of string
     | Bool of bool
@@ -51,6 +52,10 @@ let parseList =
     between (pchar '(' .>> spaces) (pchar ')' .>> spaces) (many parseExpr)
     |>> List
 
+let parseParams =
+    between (pchar '[' .>> spaces) (pchar ']' .>> spaces) (many parseExpr)
+    |>> Params
+
 let parseAtom : LispParser<LispVal> =
     parse {
         let! first = (letter <|> symbol) .>> spaces
@@ -71,6 +76,7 @@ let runParserRef () =
                      parseAtom
                      parseString
                      parseQuoted
+                     parseParams
                      parseList ])
 
 let parseExpression (input: string) = run (spaces >>. many parseExpr) input
