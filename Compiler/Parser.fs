@@ -25,21 +25,21 @@ and LispVal =
 
 type LispParser<'T> = Parser<'T, unit>
 
-let parseExpr, parseExprRef : LispParser<LispVal> * LispParser<LispVal> ref = createParserForwardedToRef ()
+let parseExpr, parseExprRef: LispParser<LispVal> * LispParser<LispVal> ref = createParserForwardedToRef ()
 
 let chr c = skipChar c
 let endBy p sep = many (p .>> sep)
-let symbol : LispParser<char> = anyOf "!$%&|*+-/:<=>?@^_~#"
+let symbol: LispParser<char> = anyOf "!$%&|*+-/:<=>?@^_~#"
 
 //let parseList : LispParser<LispVal> = sepBy parseExpr spaces |>> List
 
-let parseQuoted : LispParser<LispVal> =
+let parseQuoted: LispParser<LispVal> =
     chr ("'" |> char) >>. parseExpr
     |>> fun expr -> List [ Atom "quote"; expr ]
 
-let parseNumber : LispParser<LispVal> = pint64 .>> spaces |>> Number
+let parseNumber: LispParser<LispVal> = spaces >>. pint64 .>> spaces |>> Number
 
-let parseString : LispParser<LispVal> =
+let parseString: LispParser<LispVal> =
     parse {
         do! chr '"'
         let! xs = manyChars (noneOf "\"") .>> spaces
@@ -56,11 +56,11 @@ let parseParams =
     between (pchar '[' .>> spaces) (pchar ']' .>> spaces) (many parseExpr)
     |>> Params
 
-let parseAtom : LispParser<LispVal> =
+let parseAtom: LispParser<LispVal> =
     parse {
-        let! first = (letter <|> symbol) .>> spaces
+        let! first = letter <|> symbol
 
-        let! rest = manyChars (letter <|> symbol) .>> spaces
+        let! rest = manyChars (letter <|> digit <|> symbol) .>> spaces
 
         return
             match first.ToString() + rest with
@@ -72,8 +72,8 @@ let parseAtom : LispParser<LispVal> =
 let runParserRef () =
     do
         (parseExprRef
-         := choice [ parseNumber
-                     parseAtom
+         := choice [ parseAtom
+                     parseNumber
                      parseString
                      parseQuoted
                      parseParams
