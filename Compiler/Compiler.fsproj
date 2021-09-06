@@ -5,11 +5,11 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="Sabre">
-      <HintPath>../ILCode/bin/Release/net5.0/Sabre.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  <!-- <ItemGroup> -->
+  <!--   <Reference Include="Sabre"> -->
+  <!--     <HintPath>../ILCode/bin/Release/net5.0/Sabre.dll</HintPath> -->
+  <!--   </Reference> -->
+  <!-- </ItemGroup> -->
 
   <ItemGroup>
     <Compile Include="Lexer.fs" />

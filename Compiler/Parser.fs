@@ -16,7 +16,8 @@ and LispVal =
     | Atom of string
     | Func of FunctionMetadata
     | List of LispVal list
-    | Number of int
+    | Params of LispVal list
+    | Number of int64
     | String of string
     | Bool of bool
     | PrimitiveFunc of (LispVal list -> LispVal)
@@ -24,38 +25,42 @@ and LispVal =
 
 type LispParser<'T> = Parser<'T, unit>
 
-let parseExpr, parseExprRef : LispParser<LispVal> * LispParser<LispVal> ref = createParserForwardedToRef ()
+let parseExpr, parseExprRef: LispParser<LispVal> * LispParser<LispVal> ref = createParserForwardedToRef ()
 
 let chr c = skipChar c
 let endBy p sep = many (p .>> sep)
-let symbol : LispParser<char> = anyOf "!$%&|*+-/:<=>?@^_~#"
+let symbol: LispParser<char> = anyOf "!$%&|*+-/:<=>?@^_~#"
 
 //let parseList : LispParser<LispVal> = sepBy parseExpr spaces |>> List
 
-let parseQuoted : LispParser<LispVal> =
-    chr ("'" |> char) >>. parseExpr
+let parseQuoted: LispParser<LispVal> =
+    chr '\'' .>> spaces >>. parseExpr
     |>> fun expr -> List [ Atom "quote"; expr ]
 
-let parseNumber : LispParser<LispVal> =
-    many1Chars digit .>> spaces
-    |>> (System.Int32.Parse >> Number)
+let parseNumber: LispParser<LispVal> = spaces >>. pint64 .>> spaces |>> Number
 
-let parseString : LispParser<LispVal> =
+let parseString: LispParser<LispVal> =
     parse {
         do! chr '"'
         let! xs = manyChars (noneOf "\"") .>> spaces
         do! chr '"'
         return String(xs)
     }
+    .>> spaces
 
 let parseList =
     between (pchar '(' .>> spaces) (pchar ')' .>> spaces) (many parseExpr)
     |>> List
 
-let parseAtom : LispParser<LispVal> =
+let parseParams =
+    between (pchar '[' .>> spaces) (pchar ']' .>> spaces) (many parseExpr)
+    |>> Params
+
+let parseAtom: LispParser<LispVal> =
     parse {
-        let! first = (letter <|> symbol) .>> spaces
-        let! rest = manyChars (letter <|> symbol <|> digit) .>> spaces
+        let! first = letter <|> symbol
+
+        let! rest = manyChars (letter <|> digit <|> symbol) .>> spaces
 
         return
             match first.ToString() + rest with
@@ -64,13 +69,24 @@ let parseAtom : LispParser<LispVal> =
             | atom -> Atom atom
     }
 
-let parse () =
+let runParserRef () =
     do
         (parseExprRef
          := choice [ parseAtom
-                     parseString
                      parseNumber
+                     parseString
                      parseQuoted
+                     parseParams
                      parseList ])
 
-let show () = parseExprRef
+let parseExpression (input: string) = run (spaces >>. many parseExpr) input
+
+let unparse (result) =
+        match result with
+        | ParserResult.Success (a,_,_) -> a
+        | ParserResult.Failure (msg, _, _) -> failwithf "%A" msg
+    
+let parse (input: string list) =
+    runParserRef ()
+    parseExpression (String.Join(" ", input))
+    |> unparse
