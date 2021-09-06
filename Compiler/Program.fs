@@ -2,6 +2,7 @@ open System
 
 open Lexer
 open Parser
+open ILGenerator
 
 [<EntryPoint>]
 let main argv =
@@ -25,6 +26,13 @@ let main argv =
     """
     |> tokenize
     |> parse
+    |> printfn "%A"
+
+    "(format \"Hello from Sabre :)\")"
+    |> tokenize
+    |> parse
+    |> List.head
+    |> keywordsMatch
     |> printfn "%A"
 
 

@@ -14,6 +14,7 @@
   <ItemGroup>
     <Compile Include="Lexer.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="ILGenerator.fs" />
     <Compile Include="REPL.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
