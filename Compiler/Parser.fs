@@ -34,7 +34,7 @@ let symbol: LispParser<char> = anyOf "!$%&|*+-/:<=>?@^_~#"
 //let parseList : LispParser<LispVal> = sepBy parseExpr spaces |>> List
 
 let parseQuoted: LispParser<LispVal> =
-    chr ("'" |> char) >>. parseExpr
+    chr '\'' .>> spaces >>. parseExpr
     |>> fun expr -> List [ Atom "quote"; expr ]
 
 let parseNumber: LispParser<LispVal> = spaces >>. pint64 .>> spaces |>> Number
@@ -81,6 +81,12 @@ let runParserRef () =
 
 let parseExpression (input: string) = run (spaces >>. many parseExpr) input
 
+let unparse (result) =
+        match result with
+        | ParserResult.Success (a,_,_) -> a
+        | ParserResult.Failure (msg, _, _) -> failwithf "%A" msg
+    
 let parse (input: string list) =
     runParserRef ()
     parseExpression (String.Join(" ", input))
+    |> unparse

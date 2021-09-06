@@ -19,4 +19,13 @@ let main argv =
     |> tokenize
     |> parse
     |> printfn "%A"
+
+    """
+    (setv var1 'abc)
+    """
+    |> tokenize
+    |> parse
+    |> printfn "%A"
+
+
     0
