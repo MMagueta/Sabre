@@ -5,14 +5,14 @@ open Parser
 open ILGenerator
 
 [<EntryPoint>]
-let main argv =
-    "(format \"Hello from Sabre :)\")"
+let main _ =
+    "(printfn \"Hello from Sabre :)\")"
     |> tokenize
     |> parse
     |> printfn "%A"
 
     """
-    (defun fib [num num2]
+    (let fib [num num2]
       (match num
        ((x when (< x 2)) -> (x))
         (x when (>= 2)) -> (+ (fib (- x 1)) (fib (- x 2)))))
@@ -21,19 +21,11 @@ let main argv =
     |> parse
     |> printfn "%A"
 
-    """
-    (setv var1 'abc)
-    """
+    "(let x (printfn \"Hello from Sabre :)\"))"
     |> tokenize
     |> parse
+    |> traverse
+    |> format
     |> printfn "%A"
-
-    "(format \"Hello from Sabre :)\")"
-    |> tokenize
-    |> parse
-    |> List.head
-    |> keywordsMatch
-    |> printfn "%A"
-
 
     0
